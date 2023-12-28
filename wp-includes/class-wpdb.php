@@ -691,6 +691,21 @@ class wpdb {
 	private $allow_unsafe_unquoted_parameters = true;
 
 	/**
+	 * Whether to use the mysqli extension over mysql. This is no longer used as the mysql
+	 * extension is no longer supported.
+	 *
+	 * Default true.
+	 *
+	 * @since 3.9.0
+	 * @since 6.4.0 This property was removed.
+	 * @since 6.4.1 This property was reinstated and its default value was changed to true.
+	 *              The property is no longer used in core but may be accessed externally.
+	 *
+	 * @var bool
+	 */
+	private $use_mysqli = true;
+
+	/**
 	 * Whether we've managed to successfully connect at some point.
 	 *
 	 * @since 3.9.0
@@ -1539,7 +1554,7 @@ class wpdb {
 				$k = 1;
 				$l = strlen( $s );
 				while ( $k <= $l && '%' === $s[ $l - $k ] ) {
-					$k++;
+					++$k;
 				}
 
 				$placeholder = '%' . ( $k % 2 ? '%' : '' ) . $format . $type;
@@ -1600,7 +1615,7 @@ class wpdb {
 			$new_query .= $split_query[ $key - 2 ] . $split_query[ $key - 1 ] . $placeholder;
 
 			$key += 3;
-			$arg_id++;
+			++$arg_id;
 		}
 
 		// Replace $query; and add remaining $query characters, or index 0 if there were no placeholders.
@@ -1632,7 +1647,7 @@ class wpdb {
 				$used_placeholders[ $arg_pos ][] = $placeholder;
 
 				$key += 3;
-				$arg_id++;
+				++$arg_id;
 			}
 
 			$conflicts = array();
@@ -2304,7 +2319,7 @@ class wpdb {
 			if ( $this->result instanceof mysqli_result ) {
 				while ( $row = mysqli_fetch_object( $this->result ) ) {
 					$this->last_result[ $num_rows ] = $row;
-					$num_rows++;
+					++$num_rows;
 				}
 			}
 
@@ -2334,7 +2349,7 @@ class wpdb {
 			$this->result = mysqli_query( $this->dbh, $query );
 		}
 
-		$this->num_queries++;
+		++$this->num_queries;
 
 		if ( defined( 'SAVEQUERIES' ) && SAVEQUERIES ) {
 			$this->log_query(
@@ -3878,7 +3893,7 @@ class wpdb {
 				$new_array = array();
 				foreach ( (array) $this->col_info as $col ) {
 					$new_array[ $i ] = $col->{$info_type};
-					$i++;
+					++$i;
 				}
 				return $new_array;
 			} else {
